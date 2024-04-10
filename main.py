@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import requests
 import datetime
+import geocoder
 
 app = Flask(__name__)
 
@@ -9,13 +10,13 @@ def get_temp(location):
     api_key = 'fd4990f3b8581815656c8049597e35e1'
     url = f"https://api.openweathermap.org/data/2.5/weather?"
     
-    dict1 = {
+    d = {
         'q':location,
         'appid':api_key,
         'units': 'metric'
         }
     
-    resp = requests.get(url, params=dict1)
+    resp = requests.get(url, params=d)
     if resp.status_code == 200:
         data = resp.json()
         temp = data['main']['temp']
@@ -43,7 +44,8 @@ def get_temp(location):
 
 @app.route('/')
 def home():
-    location = 'jaipur'
+    g = geocoder.ip('me')
+    location = g[0].raw['city']
     data = get_temp(location)
     return render_template('index.html', dict1 = data)
 
